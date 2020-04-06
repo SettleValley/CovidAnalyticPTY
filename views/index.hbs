@@ -1,0 +1,48 @@
+<canvas id="myChart" width="400" height="400"></canvas>
+
+<script>
+    const rawData = "{{data}}";
+    const data = JSON.parse(rawData.replace(/&quot;/g,'"'));
+    const muertos = [];
+    const fechas = [];
+
+    data.map((e)=>{
+        fechas.push(e["date"])
+    })
+
+    data.map((e)=>{
+        muertos.push(e["deaths"])
+    })
+    console.log(fechas);
+    console.log(muertos);
+
+    const ctx = document.getElementById('myChart');
+    const myChart = new Chart(ctx, {
+        type: 'line',
+    data: {
+        labels: fechas,
+        datasets: [{
+            label: 'Muertos', // Name the series
+            data: muertos, // Specify the data values array
+            fill: false,
+            borderColor: '#ff0000', // Add custom color border (Line)
+            backgroundColor: '#ff0000', // Add custom color background (Points and Fill)
+            borderWidth: 1 // Specify bar border width
+        },
+        label: 'Casos', // Name the series
+            data: muertos, // Specify the data values array
+            fill: false,
+            borderColor: '#2196f3', // Add custom color border (Line)
+            backgroundColor: '#2196f3', // Add custom color background (Points and Fill)
+            borderWidth: 1 // Specify bar border width
+        }
+        
+        
+        ]},
+        options: {
+        responsive: true, // Instruct chart js to respond nicely.
+        maintainAspectRatio: false, // Add to prevent default behaviour of full-width/height 
+        }
+    });
+
+</script>

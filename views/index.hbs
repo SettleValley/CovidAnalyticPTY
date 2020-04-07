@@ -1,12 +1,20 @@
 <canvas id="myChart" width="400" height="400"></canvas>
 
+<div>
+    <h1 id="infectadosTomorrow"></h1>
+    <h1 id="muertosTomorrow"></h1>
+</div>
+
 <script>
     const rawData = "{{data}}";
     const data = JSON.parse(rawData.replace(/&quot;/g,'"'));
     const muertos = [];
     const fechas = [];
     const casos = [];
-
+    const recuperado = [];
+    const quincena = 15;
+    let sumatoriaInfectados = 0;
+    
     data.map((e)=>{
         fechas.push(e["date"])
     })
@@ -18,6 +26,26 @@
     data.map((e)=>{
         casos.push(e["cases"])
     })
+    
+    data.map((e)=>{
+        recuperado.push(e["recovered"])
+    })
+
+    for(var i = casos.length - quincena; i < casos.length ; i++){
+        sumatoriaInfectados = (parseInt(casos[i]) - parseInt(casos[i-1])) + sumatoriaInfectados;
+    }
+
+    let infectadosTomorrow = (sumatoriaInfectados/quincena) + parseInt(casos[casos.length - 1]);
+    
+    $("#infectadosTomorrow").append(`<span>Probables casos de infectarse mañana: ${parseFloat(infectadosTomorrow).toFixed(0)}</span>`);
+
+    //----------------------    Porcentaje de Muertos  
+    const CasosHoy = casos[casos.length-1];
+    const MuertosHoy = muertos[muertos.length-1];
+    const PorcentajeMuertos = MuertosHoy/CasosHoy*100;
+    //----------------------    Muertos de Mañana
+    let muertosTomorrow = (infectadosTomorrow * PorcentajeMuertos / 100);
+    $("#muertosTomorrow").append(`<span>Probables muertos mañana: ${parseFloat(muertosTomorrow).toFixed(0)}</span>`);
 
     const ctx = document.getElementById('myChart');
     const myChart = new Chart(ctx, {
@@ -27,24 +55,31 @@
         datasets:[
             {
                 label: "Muertos",
-                fillColor: "rgba(220,220,220,0.2)",
-                strokeColor: "rgba(220,220,220,1)",
-                pointColor: "rgba(220,220,220,1)",
-                pointStrokeColor: "#fff",
-                pointHighlightFill: "#fff",
-                pointHighlightStroke: "rgba(220,220,220,1)",
+                borderColor: '#ff0000', // Add custom color border (Line)
+                pointBackgroundColor:'#ff0000',
+                backgroundColor: 'rgba(255, 0, 0, 0.3)', // Add custom color background (Points and Fill)
+                borderWidth: 1, // Specify bar border width 
+                fill: true, 
                 data: muertos
             },
             {
-            label: "Casos",
-            fillColor: "rgba(173, 253, 162,0.2)",
-            strokeColor: "rgba(173, 253, 162,1)",
-            pointColor: "rgba(173, 253, 162,1)",
-            pointStrokeColor: "#19e600",
-            pointHighlightFill: "#fff",
-            pointHighlightStroke: "rgb(173, 253, 162, 1)",
-            data: casos
-        }
+                label: "Casos",
+                borderColor: '#f5f51c', // Add custom color border (Line)
+                pointBackgroundColor:'#f5f51c',
+                backgroundColor: 'rgb(245, 245, 28, 0.3)', // Add custom color background (Points and Fill)
+                borderWidth: 1, // Specify bar border width 
+                fill: true,
+                data: casos
+            },
+            {
+                label: "Recuperados",
+                borderColor: '#6dde5f', // Add custom color border (Line)
+                pointBackgroundColor:'#6dde5f',
+                backgroundColor: 'rgba(109, 222, 95, 0.3)', // Add custom color background (Points and Fill)
+                borderWidth: 1, // Specify bar border width 
+                fill: true,
+                data: recuperado
+            }
         ],
 
        },
